@@ -1,20 +1,10 @@
 <?php
 session_start();
+require 'hangedman.php';
+require 'database.php';
 
 $message = "";
 $console = $_SESSION;
-
-/*
-$_SESSION['wordToGuess'] = $words[$random_word];
-$_SESSION['wordToGuessArray'] = array();
-$_SESSION['wordToGuessLetterCount'] = $letter_count;
-$_SESSION['totalLife'] = 6;
-$_SESSION['letterUsedCount'] = 0;
-$_SESSION['letterUsed'] = array;
-$_SESSION['gameOver'] = false;
-*/
-
-
 
 //letter used 
 $total_life_dashes = implode(" ", $_SESSION['letterUsed']);
@@ -22,65 +12,89 @@ $total_life_dashes = implode(" ", $_SESSION['letterUsed']);
 //letter used 
 $words_to_guess_dashes = implode(" ", $_SESSION['wordToGuessArray']);
 
-// when user submit new letter
-if (isset($_POST['letterInput']) && !empty($_POST['letterInput']) && $_POST['letterInput'] != "") {
+// check if game is already over
+if (!$_SESSION['gameOver']) {
 
-    // find the position of the letter in the word
-    $value = $_POST["letterInput"];
-    $position = strpos($_SESSION['wordToGuess'], $value);
+    // when user submit new letter
+    $_SESSION['input'] = $_POST['letterInput'];
+    if (isset($_POST['letterInput']) && !empty($_POST['letterInput']) && $_POST['letterInput'] != "") {
 
-    // check if the word is alphabet
-    if (!preg_match("/^[a-zA-Z]*$/", $value)) {
+        // find the position of the letter in the word
+        $value = strtoupper($_POST["letterInput"]);
+        $offset = 0;
+        $allpos = array();
+        while (($pos = strpos($_SESSION['wordToGuess'], $value, $offset)) !== FALSE) {
+            $offset   = $pos + 1;
+            $allpos[] = $pos;
+        }
+        $position = strpos($_SESSION['wordToGuess'], $value);
+        $_SESSION['positions'] = $allpos;
 
-        $message = "Only letters allowed";
+        // check if the word is alphabet
+        if (!preg_match("/^[a-zA-Z]*$/", $value)) {
 
-        //check if the there is only one letter 
-    } elseif (strlen($value) > 1) {
+            $message = "Only letters allowed";
 
-        $message = "Only one letter allowed at a time";
-    } elseif ($position === false) {
-        //if the letter is not found then add that letter to used letter array and update the remaining life
-        $_SESSION['letterUsedCount']++;
-        //$_SESSION['letterUsed'][] = $value;
+            //check if the there is only one letter 
+        } elseif (strlen($value) > 1) {
 
-        //$total_life_dashes
-        for ($i = 0; $i < 6; $i++) {
-            if ($_SESSION['letterUsed'][$i] == "_") {
-                $_SESSION['letterUsed'][$i] = $value;
-                break;
+            $message = "Only one letter allowed at a time";
+        } elseif (count($allpos) < 1) {
+            //if the letter is not found then add that letter to used letter array and update the remaining life
+            $_SESSION['letterUsedCount']++;
+
+            //$total_life_dashes
+            for ($i = 0; $i < 6; $i++) {
+                if ($_SESSION['letterUsed'][$i] == "_") {
+                    $_SESSION['letterUsed'][$i] = $value;
+                    break;
+                }
+            }
+            $total_life_dashes = implode(" ", $_SESSION['letterUsed']);
+
+            $message = "Letter not found";
+
+            //check if the all the 6 life are used then game over
+            if ($_SESSION['letterUsedCount'] >= 6) {
+                $_SESSION['gameOver'] = true;
+                $_SESSION['letterUsed'] = array();
+                $message = "You Lose";
+            }
+        } else {
+
+            //if the letter found and any position in the word
+            //add letter to the position where it is found
+            for ($i = 0; $i < count($allpos); $i++) {
+                $posit = $allpos[$i];
+                $_SESSION['wordToGuessArray'][$posit] = $value;
+                $_SESSION['letterTrueGuess']++;
+            }
+            $words_to_guess_dashes = implode(" ", $_SESSION['wordToGuessArray']);
+            $message = "Letter matched";
+
+
+            //check if the all letter are guessed
+            if ($_SESSION['letterTrueGuess'] >= $_SESSION['wordToGuessLetterCount']) {
+                $_SESSION['gameOver'] = true;
+                $_SESSION['letterUsed'] = array();
+                $message = "You Won";
+                //enter win into db
+                $sql = "INSERT INTO Scores (userid, strikes, word, word_length ) VALUES (:userid, :strikes, :word, :word_length)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':userid', $_SESSION['user_id']);
+                $stmt->bindParam(':strikes', $_SESSION['letterUsedCount']);
+                $stmt->bindParam(':word', $_SESSION['wordToGuess']);
+                $stmt->bindParam(':word_length', $_SESSION['wordToGuessLetterCount']);
+                if ($stmt->execute()) {
+                    $message = 'You won! Score entered';
+                } else {
+                    $message = 'You won! Score entry error';
+                }
             }
         }
-        $total_life_dashes = implode(" ", $_SESSION['letterUsed']);
-
-        $message = "Letter not found";
-
-        //check if the all the 6 life are used then game over
-        if ($_SESSION['letterUsedCount'] >= 6) {
-            $_SESSION['gameOver'] = true;
-            $_SESSION['letterUsed'] = array();
-            $message = "You Lose";
-        }
     } else {
-
-        //if the letter found and any position in the word
-        //add letter to the position where it is found
-        $_SESSION['wordToGuessArray'][$position] = $value;
-        $words_to_guess_dashes = implode(" ", $_SESSION['wordToGuessArray']);
-        $_SESSION['letterTrueGuess']++;
-        $message = "Letter matched";
-
-
-        //check if the all letter are guessed
-        if ($_SESSION['letterTrueGuess'] >= $_SESSION['wordToGuessLetterCount']) {
-            $_SESSION['gameOver'] = true;
-            $_SESSION['letterUsed'] = array();
-            $message = "You Won";
-        }
     }
-} else { 
-    $message = "Error: Empty input";
 }
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -106,39 +120,19 @@ if (isset($_POST['letterInput']) && !empty($_POST['letterInput']) && $_POST['let
                     <span class="text-muted">Game Progress/Output</span>
                 </h4>
                 <div id="hangmanPhoto">
-                    <span><?php echo $_SESSION['username']; ?></span>
                     <?php
-                    $hangman_photo = "hangman0.png";
-                    if ($_SESSION['letterUsedCount'] == 0) {
-                        $hangman_photo = "hangman0.png";
-                    } elseif ($_SESSION['letterUsedCount'] == 1) {
-                        $hangman_photo = "hangman1.png";
-                    } elseif ($_SESSION['letterUsedCount'] == 2) {
-                        $hangman_photo = "hangman2.png";
-                    } elseif ($_SESSION['letterUsedCount'] == 3) {
-                        $hangman_photo = "hangman3.png";
-                    } elseif ($_SESSION['letterUsedCount'] == 4) {
-                        $hangman_photo = "hangman4.png";
-                    } elseif ($_SESSION['letterUsedCount'] == 5) {
-                        $hangman_photo = "hangman5.png";
-                    } elseif ($_SESSION['letterUsedCount'] == 6) {
-                        $hangman_photo = "hangman6.png";
-                    } else {
-                        $hangman_photo = "hangman0.png";
-                    }
+                    $hangman_photo = $hang[$_SESSION['letterUsedCount']];
+
                     ?>
-                    <img class="d-block mx-auto mb-4" src="assets/images/<?php echo $hangman_photo; ?>" alt="" width="200">
+                    <?php echo $hangman_photo; ?>
                 </div>
                 <div class="remaining-guesses">
-                    <span>Remaining Gueses</span>
-                    <strong><?php echo $_SESSION['totalLife'] - $_SESSION['letterUsedCount']; ?></strong>
+                    <strong>Remaining Guesses: <?php echo $_SESSION['totalLife'] - $_SESSION['letterUsedCount']; ?></strong>
                 </div>
 
 
             </div>
             <div>
-                <h4>Game Board</h4>
-
                 <form id="gameData" action="" method="post">
                     <div class="row">
                         <div>
@@ -153,21 +147,28 @@ if (isset($_POST['letterInput']) && !empty($_POST['letterInput']) && $_POST['let
                             <label>Enter your guess</label>
                             <input class='guess' type="text" id="letterInput" name="letterInput" value="">
                         </div>
+                        <div class="col-md-12" id="result"><?php echo $message; ?></div>
                         <div>
-                            <input type="submit" value="Submit">
+                            <?php if (!$_SESSION['gameOver']) : ?>
+                                <input type="submit" value="Submit">
+                            <?php endif; ?>
+                            <?php if ($_SESSION['gameOver']) : ?>
+                                <div class="play-again">
+
+                                    <a href="setup.php">Play Again?</a>
+                                </div>
+                                <div class="scores">
+                                    <a href="scores.php">View high scores</a>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <hr>
                     <div class="row">
-                        <div>
-                            <a href="logout.php">Logout</a>
-                        </div>
                     </div>
                     <h4>Result</h4>
                     <div class="row">
-                        <div class="col-md-12" id="result"><?php echo $message; ?></div>
                         <div class="col-md-12" id="result"><?php echo '<pre>' . print_r($_SESSION, TRUE) . '</pre>' ?></div>
-
                     </div>
 
             </div>

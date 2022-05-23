@@ -44,12 +44,22 @@ header {
   margin-bottom: 10px;
   width: 100%;
   text-align: center;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 header a {
   text-decoration: none;
-  color: #333;
 }
 
-/* div.guess{
+ div.guess{
   font-size: larger;
-} */
+} 
+div.header-container {
+}
+div.title {
+  grid-column: 2;
+}
+div.user {
+  grid-column: 3;
+}
