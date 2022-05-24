@@ -1,10 +1,6 @@
 <?php
 
 
-$server = "sql104.epizy.com";
-$username = "epiz_31705905";
-$password = "wHyNh7spZrIZD";
-$database = "epiz_31705905_denver";
 
 
 try {
