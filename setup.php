@@ -5,15 +5,15 @@
  $records = $conn->prepare('SELECT upper(word) as word FROM Words ORDER BY RAND() LIMIT 1;');
  $records->execute();
  $results = $records->fetch(PDO::FETCH_ASSOC);
-$_SESSION['ranword']=$results;
+ $_SESSION['ranword']=$results;
 
-$words = array(
-    // "robust",
-    // "polar", 
-    // "measly", 
-    // "movie",
-    "thirsty"
-  );
+// $words = array(
+//     // "robust",
+//     // "polar", 
+//     // "measly", 
+//     // "movie",
+//     "thirsty"
+//   );
 
   $random_word = $results['word'];
   $letter_count = strlen($random_word);
