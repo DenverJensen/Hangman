@@ -1,8 +1,10 @@
+<?php
+session_start();
+?>
 <html>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
     <style type="text/css">
         table,
         th,
@@ -23,8 +25,6 @@
 
         th {
             background-color: #6666FF;
-
-
         }
 
         .center {
@@ -56,26 +56,23 @@
                 <th>UserID</td>
                 <th>Strikes</td>
                 <th>Word</td>
-                <th>Word Length</td>
             </tr>
         </thead>
         <tbody>
             <?php
             require 'database.php';
-            session_start();
 
-            $records = $conn->prepare('SELECT * from Scores');
+            $records = $conn->prepare('SELECT U.username, S.strikes, S.word FROM Scores AS S JOIN Users AS U ON U.id = S.userid WHERE S.word_length = :wlength order by S.strikes asc LIMIT 10');
+            $records->bindParam(':wlength', $_SESSION['wordToGuessLetterCount']);
             $records->execute();
             $rows = $records->fetchall(PDO::FETCH_ASSOC);
 
             foreach ($rows as $row) {
                 echo "
             <tr>
-                <td>" . $row['userid'] . "</td>
+                <td>" . $row['username'] . "</td>
                 <td>" . $row["strikes"] . "</td>
                 <td>" . $row["word"] . "</td>
-                <td>" . $row["word_length"] . "</td>
-
             </tr>
             ";
             }

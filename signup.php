@@ -15,7 +15,6 @@ if (!empty($_POST['username']) && !empty($_POST['password'])) {
   if (empty($results['username'])) {
     print_r($results);
     //if user doesnt exist then insert
-
     $sql = "INSERT INTO Users (username, password) VALUES (:username, :password)";
     if ($_POST['password'] === $_POST['confirm_password']) {
       $uppercase = preg_match('@[A-Z]@', $_POST['password']);
@@ -27,7 +26,6 @@ if (!empty($_POST['username']) && !empty($_POST['password'])) {
         $message = 'Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.';
         
       } else {
-        // todo: add salt
         $sql = "INSERT INTO Users (username, password) VALUES (:username, :password)";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':username', $_POST['username']);
@@ -43,6 +41,7 @@ if (!empty($_POST['username']) && !empty($_POST['password'])) {
           $results = $records->fetch(PDO::FETCH_ASSOC);
           $_SESSION['username'] = $results['username'];
           $_SESSION['user_id'] = $results['id'];
+          header('Location:setup.php');
         } else {
           $message = 'Sorry there must have been an issue creating your account';
         }
@@ -63,8 +62,6 @@ if (!empty($_POST['username']) && !empty($_POST['password'])) {
 <head>
   <meta charset="utf-8">
   <title>SignUp</title>
-  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>

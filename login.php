@@ -3,7 +3,7 @@
 session_start();
 
 if (isset($_SESSION['user_id'])) {
-  header('Location:hangman.php');
+  header('Location:setup.php');
 }
 require 'database.php';
 
@@ -26,7 +26,7 @@ if (!empty($_POST['username']) && !empty($_POST['password'])) {
     $message = 'Sorry, those credentials do not match';
   }
 } else {
-  $message = 'Please enter a correct username and password';
+  $message = 'Please enter a username and password';
 }
 
 ?>
@@ -37,8 +37,6 @@ if (!empty($_POST['username']) && !empty($_POST['password'])) {
 <head>
   <meta charset="utf-8">
   <title>Login</title>
-  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
@@ -56,7 +54,6 @@ if (!empty($_POST['username']) && !empty($_POST['password'])) {
     <input name="password" type="password" placeholder="Enter your Password">
     <input type="submit" value="Submit">
   </form>
-  <div class="col-md-12" id="result"><?php echo '<pre>' . print_r($_SESSION, TRUE) . '</pre>' ?></div>
 
 </body>
 
