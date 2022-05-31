@@ -30,16 +30,12 @@
     $_SESSION['letterUsed'][] = "_";
   }
 
-  // $_SESSION['letterUsed'][0] = "_";
-  // $_SESSION['letterUsed'][1] = "_";
-  // $_SESSION['letterUsed'][2] = "_";
-  // $_SESSION['letterUsed'][3] = "_";
-  // $_SESSION['letterUsed'][4] = "_";
-  // $_SESSION['letterUsed'][5] = "_";
   
   $_SESSION['letterUsedCount'] = 0;
   $_SESSION['letterTrueGuess'] = 0;
   $_SESSION['gameOver'] = false;
+
+  $_SESSION['message'] = '';
 
   header("Location:hangman.php");
 

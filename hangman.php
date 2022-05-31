@@ -49,13 +49,10 @@ session_start();
                         </div>
                         <div class="guess">
                             <label>Enter your guess</label>
-                            <input class='guess' type="text" id="letterInput" name="letterInput" value="">
+                            <input class='guess' type="text" id="letterInput" name="letterInput" value="" autofocus>
                         </div>
                         <div class="col-md-12" id="result"><?php echo $_SESSION['message']; ?></div>
                         <div>
-                            <?php if (!$_SESSION['totalLife'] === 0) : ?>
-                                <?php echo $_SESSION['wordToGuess'] ?>
-                            <?php endif; ?>
                             <?php if (!$_SESSION['gameOver']) : ?>
                                 <input type="submit" value="Submit">
                             <?php endif; ?>
@@ -65,7 +62,7 @@ session_start();
                                     <a href="setup.php">Play Again?</a>
                                 </div>
                                 <div class="scores">
-                                    <a href="scores.php">View high scores</a>
+                                    <a href="scores.php">View top 10 scores for words of same length</a>
                                 </div>
                             <?php endif; ?>
                         </div>

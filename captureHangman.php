@@ -64,7 +64,7 @@ if (!$_SESSION['gameOver']) {
                 if ($_SESSION['letterUsedCount'] >= $_SESSION['totalLife']) {
                     $_SESSION['gameOver'] = true;
                     $_SESSION['letterUsed'] = array();
-                    $_SESSION['message'] = "You Lose";
+                    $_SESSION['message'] = "You Lose! \n Your word was " . $_SESSION['wordToGuess'];
                 }
             } else {
 

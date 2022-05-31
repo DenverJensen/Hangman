@@ -1,6 +1,7 @@
 <?php
 
 require 'database.php';
+session_start();
 
 $message = '';
 $results = [];
@@ -24,7 +25,6 @@ if (!empty($_POST['username']) && !empty($_POST['password'])) {
       // Validate password strength
       if (!$uppercase || !$lowercase || !$number || !$specialChars || strlen($_POST['password']) < 8) {
         $message = 'Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.';
-        
       } else {
         $sql = "INSERT INTO Users (username, password) VALUES (:username, :password)";
         $stmt = $conn->prepare($sql);
@@ -80,10 +80,7 @@ if (!empty($_POST['username']) && !empty($_POST['password'])) {
     <input name="password" type="password" placeholder="Enter your Password">
     <input name="confirm_password" type="password" placeholder="Confirm Password">
     <input type="submit" value="Submit">
-
   </form>
-  <div class="col-md-12" id="result"><?php echo '<pre>' . print_r($_SESSION, TRUE) . '</pre>' ?></div>
-
 </body>
 
 </html>

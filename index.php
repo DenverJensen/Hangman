@@ -10,7 +10,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Welcome to Hangmanz</title>
+    <title>Welcome to Hangman</title>
   </head>
   <body>
     <?php require 'partials/header.php' ?>
