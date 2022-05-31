@@ -24,7 +24,7 @@ session_start();
         }
 
         th {
-            background-color: #6666FF;
+            background-color: #0098cb;
         }
 
         .center {

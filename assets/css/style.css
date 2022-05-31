@@ -2,11 +2,9 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: "Roboto", sans-serif;
+  font-family: "Roboto", sans-serif !important;
   text-align: center;
 }
-
-
 /* Input Forms*/
 input[type="text"],
 input[type="password"],
@@ -19,9 +17,10 @@ input[type="confirm_password"] {
   border: 1px solid #eee;
   margin: 20px auto;
 }
-
-
-
+input.guess{
+font-size: larger;
+max-width: 69px;
+}
 input[type="submit"] {
   padding: 10px;
   color: #fff;
@@ -36,7 +35,6 @@ input[type="submit"] {
 input[type="submit"]:hover {
   background-color: #00b8eb;
 }
-
 /* Header */
 header {
   border-bottom: 2px solid #eee;
@@ -51,10 +49,8 @@ header a {
   text-decoration: none;
 }
 
- div.guess{
+div.guess {
   font-size: larger;
-} 
-div.header-container {
 }
 div.title {
   grid-column: 2;
@@ -62,3 +58,17 @@ div.title {
 div.user {
   grid-column: 3;
 }
+.hangman{
+  width: min-content;
+  text-align: center;
+  display: inline-block;
+
+}
+
+.hangman div{
+  padding:8px;
+}
+.hangman .result{
+color: firebrick;
+}
+

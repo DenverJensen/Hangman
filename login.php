@@ -39,7 +39,7 @@ if (!empty($_POST['username']) && !empty($_POST['password'])) {
   <title>Login</title>
 </head>
 
-<body>
+<body class='login'>
   <?php require 'partials/header.php' ?>
 
   <?php if (!empty($message)) : ?>
